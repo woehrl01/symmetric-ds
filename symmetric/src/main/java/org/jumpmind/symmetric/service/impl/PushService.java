@@ -54,14 +54,14 @@ public class PushService implements IPushService {
     }
 
     public void pushData() {
-        List<Node> nodes = nodeService.findNodesToPushTo();
-        if (nodes != null && nodes.size() > 0) {
-            info("Push requested");
-            for (Node node : nodes) {
-                pushToNode(node);
+        info("Push requested");
+        List<Node> clients = nodeService.findNodesToPushTo();
+        if (clients != null) {
+            for (Node client : clients) {
+                pushToClient(client);
             }
-            info("Push request completed");
-        }        
+        }
+        info("Push request completed");
     }
 
     class ParameterParser {
@@ -102,15 +102,15 @@ public class PushService implements IPushService {
         this.transportManager = tm;
     }
 
-    public void setNodeService(INodeService nodeService) {
-        this.nodeService = nodeService;
+    public void setNodeService(INodeService clientService) {
+        this.nodeService = clientService;
     }
 
     public void setAckService(IAcknowledgeService ackService) {
         this.ackService = ackService;
     }
 
-    private void pushToNode(Node remote) {
+    private void pushToClient(Node remote) {
         try {
             IOutgoingWithResponseTransport transport = transportManager
                     .getPushTransport(remote, nodeService.findIdentity());
@@ -146,7 +146,7 @@ public class PushService implements IPushService {
             logger.warn("Server is not available at this url: "
                     + remote.getSyncURL());
         } catch (Exception e) {
-            // just report the error because we want to push to other nodes
+            // just report the error because we want to push to other clients
             // in our list
             logger.error(e, e);
         }

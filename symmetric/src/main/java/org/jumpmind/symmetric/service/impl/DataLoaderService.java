@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -113,14 +112,12 @@ public class DataLoaderService extends AbstractService implements
             }
         } catch (ConnectException ex) {
             logger.warn(ErrorConstants.COULD_NOT_CONNECT_TO_TRANSPORT);
-        } catch (UnknownHostException ex) {
-            logger.warn(ErrorConstants.COULD_NOT_CONNECT_TO_TRANSPORT + " Unknown host name of " + ex.getMessage());            
         } catch (RegistrationNotOpenException ex) {
             logger.warn("Registration attempt failed.  Registration was not open for the node.");
         } catch (Exception e) {
             if (status != null) {
                 logger.error("Failed to load batch "
-                        + status.getNodeBatchId(), e);
+                        + status.getClientBatchId(), e);
                 history.setValues(dataLoader.getStatistics(), false);
                 handleBatchError(status, history);
             } else {
@@ -182,14 +179,14 @@ public class DataLoaderService extends AbstractService implements
             }
         } catch (Exception e) {
             logger.error("Failed to record status of batch "
-                    + status.getNodeBatchId());
+                    + status.getClientBatchId());
         }
         try {
             history.setStatus(IncomingBatchHistory.Status.ER);
             incomingBatchService.insertIncomingBatchHistory(history);
         } catch (Exception e) {
             logger.error("Failed to record history of batch "
-                    + status.getNodeBatchId());
+                    + status.getClientBatchId());
         }
     }
 

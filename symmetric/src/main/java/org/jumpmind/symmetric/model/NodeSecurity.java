@@ -39,8 +39,8 @@ public class NodeSecurity {
         return nodeId;
     }
 
-    public void setNodeId(String nodeId) {
-        this.nodeId = nodeId;
+    public void setNodeId(String clientId) {
+        this.nodeId = clientId;
     }
 
     public String getPassword() {

@@ -25,7 +25,7 @@ public interface IDataLoaderContext {
 
     public String getBatchId();
 
-    public String getNodeId();
+    public String getClientId();
 
     public String getTableName();
 

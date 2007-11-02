@@ -20,16 +20,16 @@
 
 package org.jumpmind.symmetric;
 
-/**
- * Follow the Apache versioning scheme documented here: http://apr.apache.org/versioning.html
- */
 final public class Version {
 
-    public static final int MAJOR = 1;
+    public static final int MAJOR = 0;
 
-    public static final int MINOR = 0;
+    public static final int FEATURE = 0;
+
+    public static final int MILESTONE = 9;
 
     public static final int PATCH = 0;
 
-    public static final String VERSION = MAJOR + "." + MINOR + "." + PATCH;
+    public static final String VERSION = MAJOR + "." + FEATURE + "."
+            + MILESTONE + "." + PATCH;
 }

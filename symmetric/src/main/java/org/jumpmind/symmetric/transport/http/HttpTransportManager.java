@@ -43,6 +43,8 @@ import org.jumpmind.symmetric.web.WebConstants;
 
 /**
  * Allow remote communication to nodes, in order to push data, pull data, and send messages.
+ * 
+ * @author elong
  */
 public class HttpTransportManager extends AbstractTransportManager implements
         ITransportManager {
@@ -52,12 +54,12 @@ public class HttpTransportManager extends AbstractTransportManager implements
 
     private IRuntimeConfig runtimeConfiguration;
 
-    private INodeService nodeService;
+    private INodeService clientService;
 
     public HttpTransportManager(IRuntimeConfig config,
-            INodeService nodeService) {
+            INodeService clientService) {
         this.runtimeConfiguration = config;
-        this.nodeService = nodeService;
+        this.clientService = clientService;
     }
 
     public boolean sendAcknowledgement(Node remote,
@@ -159,24 +161,24 @@ public class HttpTransportManager extends AbstractTransportManager implements
     }
 
     private String addSecurityToken(String base, String connector) {
-        String nodeId = nodeService.findIdentity().getNodeId();
-        StringBuilder sb = new StringBuilder(addNodeId(base, nodeId,
+        String clientId = clientService.findIdentity().getNodeId();
+        StringBuilder sb = new StringBuilder(addNodeId(base, clientId,
                 "?"));
         sb.append(connector);
         sb.append(WebConstants.SECURITY_TOKEN);
         sb.append("=");
-        String securityToken = nodeService.findNodeSecurity(nodeId)
+        String securityToken = clientService.findNodeSecurity(clientId)
                 .getPassword();
         sb.append(securityToken);
         return sb.toString();
     }
 
-    private String addNodeId(String base, String nodeId, String connector) {
+    private String addNodeId(String base, String clientId, String connector) {
         StringBuilder sb = new StringBuilder(base);
         sb.append(connector);
         sb.append(WebConstants.NODE_ID);
         sb.append("=");
-        sb.append(nodeId);
+        sb.append(clientId);
         return sb.toString();
     }
 

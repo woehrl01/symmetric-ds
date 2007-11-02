@@ -103,7 +103,7 @@ abstract public class AbstractDbDialect implements IDbDialect {
 
     public void initConfigDb(String tablePrefix) {
         initForSpecificDialect();
-        addPrefixAndCreateTableIfNecessary(getConfigDdlDatabase());
+        addPrefixAndCreateTableIfNecessary(getConfigDdlDatabase(), tablePrefix);
     }
 
     final public boolean doesTriggerExist(String schema, String tableName, String triggerName) {
@@ -354,38 +354,23 @@ abstract public class AbstractDbDialect implements IDbDialect {
             Table table) {
         return sqlTemplate.createTriggerDDL(this, dml, config, audit, tablePrefix, table, getDefaultSchema());
     }
-    
-    public String getCreateSymmetricDDL() {
-        Database db = getConfigDdlDatabase();
-        prefixConfigDatabase(db);
-        return platform.getCreateTablesSql(db, true, true);
-    }
-    
-    protected boolean prefixConfigDatabase(Database targetTables)  {
+
+    protected void addPrefixAndCreateTableIfNecessary(Database targetTables, String tablePrefix) {
         try {
-            String tblPrefix = this.tablePrefix.toLowerCase() + "_";
+            tablePrefix = tablePrefix.toLowerCase() + "_";
 
             Table[] tables = targetTables.getTables();
 
             boolean createTables = false;
             for (Table table : tables) {
-                table.setName(tblPrefix + table.getName().toLowerCase());
-                fixForeignKeys(table, tblPrefix, false);
+                table.setName(tablePrefix.toUpperCase() + table.getName().toUpperCase());
+                fixForeignKeys(table, tablePrefix, false);
 
                 if (getMetaDataFor(getDefaultSchema(), table.getName().toUpperCase(), false) == null) {
                     createTables = true;
                 }
             }
-            
-            return createTables;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    protected void addPrefixAndCreateTableIfNecessary(Database targetTables) {
-        try {
-            boolean createTables = prefixConfigDatabase(targetTables);
             if (createTables) {
                 logger.info("About to create symmetric tables.");
                 platform.createTables(targetTables, false, true);

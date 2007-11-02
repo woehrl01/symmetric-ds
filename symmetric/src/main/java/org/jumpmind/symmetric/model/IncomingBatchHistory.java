@@ -39,7 +39,7 @@ public class IncomingBatchHistory implements Serializable {
 
     private String batchId;
 
-    private String nodeId;
+    private String clientId;
 
     private Status status;
 
@@ -74,7 +74,7 @@ public class IncomingBatchHistory implements Serializable {
 
     public IncomingBatchHistory(IDataLoaderContext context) {
         batchId = context.getBatchId();
-        nodeId = context.getNodeId();
+        clientId = context.getClientId();
         status = Status.OK;
         startTime = new Date();
     }
@@ -91,8 +91,8 @@ public class IncomingBatchHistory implements Serializable {
         }
     }    
 
-    public String getNodeBatchId() {
-        return nodeId + "-" + batchId;
+    public String getClientBatchId() {
+        return clientId + "-" + batchId;
     }
 
     public String getBatchId() {
@@ -147,12 +147,12 @@ public class IncomingBatchHistory implements Serializable {
         return hostName;
     }
 
-    public String getNodeId() {
-        return nodeId;
+    public String getClientId() {
+        return clientId;
     }
 
-    public void setNodeId(String nodeId) {
-        this.nodeId = nodeId;
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public Date getStartTime() {

@@ -59,8 +59,6 @@ public class Constants {
     
     public static final String REGISTRATION_SERVICE = "registrationService";
     
-    public static final String DATA_SERVICE = "dataService";
-    
     public static final String PUSH_SERVICE = "pushService";
     
     public static final String PULL_SERVICE = "pullService";

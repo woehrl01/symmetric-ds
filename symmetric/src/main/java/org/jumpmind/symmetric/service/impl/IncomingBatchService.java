@@ -50,19 +50,19 @@ public class IncomingBatchService extends AbstractService implements IIncomingBa
 
     private boolean skipDuplicateBatches = true;
 
-    public IncomingBatch findIncomingBatch(String batchId, String nodeId) {
+    public IncomingBatch findIncomingBatch(String batchId, String clientId) {
         try {
             return (IncomingBatch) jdbcTemplate.queryForObject(findIncomingBatchSql,
-                    new Object[] { batchId, nodeId }, new IncomingBatchMapper());
+                    new Object[] { batchId, clientId }, new IncomingBatchMapper());
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<IncomingBatchHistory> findIncomingBatchHistory(String batchId, String nodeId) {
+    public List<IncomingBatchHistory> findIncomingBatchHistory(String batchId, String clientId) {
         return (List<IncomingBatchHistory>) jdbcTemplate.query(findIncomingBatchHistorySql, new Object[] { batchId,
-                nodeId }, new IncomingBatchHistoryMapper());
+                clientId }, new IncomingBatchHistoryMapper());
     }
 
     public boolean acquireIncomingBatch(IncomingBatch status) {
@@ -73,26 +73,26 @@ public class IncomingBatchService extends AbstractService implements IIncomingBa
             status.setRetry(true);
             okayToProcess = updateIncomingBatch(status) > 0 || (! skipDuplicateBatches);
             if (okayToProcess) {
-                logger.warn("Retrying batch " + status.getNodeBatchId());
+                logger.warn("Retrying batch " + status.getClientBatchId());
             } else {
-                logger.warn("Skipping batch " + status.getNodeBatchId());
+                logger.warn("Skipping batch " + status.getClientBatchId());
             }
         }
         return okayToProcess;
     }
 
     public void insertIncomingBatch(IncomingBatch status) {
-        jdbcTemplate.update(insertIncomingBatchSql, new Object[] { status.getBatchId(), status.getNodeId(),
+        jdbcTemplate.update(insertIncomingBatchSql, new Object[] { status.getBatchId(), status.getClientId(),
                 status.getStatus().toString() });
     }
 
     public int updateIncomingBatch(IncomingBatch status) {
         return jdbcTemplate.update(updateIncomingBatchSql, new Object[] { status.getStatus().toString(),
-                status.getBatchId(), status.getNodeId(), IncomingBatch.Status.ER.toString() });
+                status.getBatchId(), status.getClientId(), IncomingBatch.Status.ER.toString() });
     }
 
     public void insertIncomingBatchHistory(IncomingBatchHistory history) {
-        jdbcTemplate.update(insertIncomingBatchHistorySql, new Object[] { history.getBatchId(), history.getNodeId(),
+        jdbcTemplate.update(insertIncomingBatchHistorySql, new Object[] { history.getBatchId(), history.getClientId(),
                 history.getStatus().toString(), history.getHostName(), history.getStatementCount(),
                 history.getFallbackInsertCount(), history.getFallbackUpdateCount(), history.getMissingDeleteCount(),
                 history.getFailedRowNumber(), history.getStartTime(), history.getEndTime() });
@@ -102,7 +102,7 @@ public class IncomingBatchService extends AbstractService implements IIncomingBa
         public Object mapRow(ResultSet rs, int num) throws SQLException {
             IncomingBatch batch = new IncomingBatch();
             batch.setBatchId(rs.getString(1));
-            batch.setNodeId(rs.getString(2));
+            batch.setClientId(rs.getString(2));
             batch.setStatus(IncomingBatch.Status.valueOf(rs.getString(3)));
             return batch;
         }
@@ -112,7 +112,7 @@ public class IncomingBatchService extends AbstractService implements IIncomingBa
         public Object mapRow(ResultSet rs, int num) throws SQLException {
             IncomingBatchHistory history = new IncomingBatchHistory();
             history.setBatchId(rs.getString(1));
-            history.setNodeId(rs.getString(2));
+            history.setClientId(rs.getString(2));
             history.setStatus(IncomingBatchHistory.Status.valueOf(rs.getString(3)));
             history.setStartTime(rs.getTime(4));
             history.setEndTime(rs.getTime(5));

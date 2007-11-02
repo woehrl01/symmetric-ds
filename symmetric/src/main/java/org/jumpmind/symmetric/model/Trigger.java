@@ -63,8 +63,6 @@ public class Trigger {
     private boolean syncOnInsert = true;
 
     private boolean syncOnDelete = true;
-    
-    private boolean syncOnIncomingBatch = false;
 
     private String nameForInsertTrigger;
 
@@ -423,14 +421,6 @@ public class Trigger {
 
     public void setTargetTableName(String targetTableName) {
         this.targetTableName = targetTableName;
-    }
-
-    public boolean isSyncOnIncomingBatch() {
-        return syncOnIncomingBatch;
-    }
-
-    public void setSyncOnIncomingBatch(boolean syncOnIncomingBatch) {
-        this.syncOnIncomingBatch = syncOnIncomingBatch;
     }
 
 }

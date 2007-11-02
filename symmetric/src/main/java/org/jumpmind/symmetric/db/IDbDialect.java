@@ -50,7 +50,7 @@ public interface IDbDialect {
 
     public String getTransactionTriggerExpression();
 
-    public String createInitalLoadSqlFor(Node node, Trigger config);
+    public String createInitalLoadSqlFor(Node client, Trigger config);
     
     public String createPurgeSqlFor(Node node, Trigger trig);
     
@@ -72,14 +72,10 @@ public interface IDbDialect {
 
     public void enableSyncTriggers();
     
-    public String getSyncTriggersExpression();
-
     public String getDefaultSchema();
     
     public int getStreamingResultsFetchSize();
     
     public JdbcTemplate getJdbcTemplate();
-    
-    public String getCreateSymmetricDDL();
     
 }

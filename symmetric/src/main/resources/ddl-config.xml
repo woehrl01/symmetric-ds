@@ -80,7 +80,7 @@
             primaryKey="true" />
         <column name="target_node_group_id" type="VARCHAR" size="50" required="true"
             primaryKey="true" />
-        <column name="data_event_action" type="CHAR" size="1" default="W" required="true" />
+        <column name="data_event_action" type="CHAR" size="1" default="U" required="true" />
         <foreign-key name="fk_dt_node_group_id" foreignTable="node_group">
             <reference local="source_node_group_id" foreign="node_group_id" />
         </foreign-key>
@@ -148,7 +148,6 @@
         <column name="sync_on_update" type="BOOLEANINT" size="1" required="true" default="1" />
         <column name="sync_on_insert" type="BOOLEANINT" size="1" required="true" default="1" />
         <column name="sync_on_delete" type="BOOLEANINT" size="1" required="true" default="1" />
-        <column name="sync_on_incoming_batch" type="BOOLEANINT" size="1" required="true" default="0" />
         <column name="name_for_update_trigger" type="VARCHAR" size="30" />
         <column name="name_for_insert_trigger" type="VARCHAR" size="30" />
         <column name="name_for_delete_trigger" type="VARCHAR" size="30" />

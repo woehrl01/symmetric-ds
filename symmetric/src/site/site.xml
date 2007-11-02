@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="SymmetricDS">
+<project name="Maven">
     <bannerLeft>
         <name>SymmetricDS</name>
-        <src>images/symmetric-chrome.png</src>
+        <!--
+            <src>images/logo_here.gif</src>
+        -->
         <href>/</href>
     </bannerLeft>
     <poweredBy>
         <logo img="http://sflogo.sourceforge.net/sflogo.php?group_id=108357&amp;type=1"
-            name="Powered by Sourceforge" href="http://sourceforge.net" />
+            name="Powered by Sourceforge"
+            href="http://sourceforge.net" />
         <logo img="images/logos/maven-feather.png" name="Powered by Apache Maven"
             href="http://maven.apache.org/" />
     </poweredBy>

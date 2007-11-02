@@ -5,7 +5,7 @@
     <groupId>org.jumpmind.symmetric</groupId>
     <artifactId>symmetric-ds</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0</version>
+    <version>0.0.9-SNAPSHOT</version>
     <name>SymmetricDS</name>
     <url>http://symmetricds.org</url>
     <inceptionYear>2007</inceptionYear>
@@ -184,22 +184,22 @@
                         </configuration>
                     </execution>
                     <!-- 
-                        <execution>
+                    <execution>
                         <id>src</id>
                         <phase>package</phase>
                         <goals>
-                        <goal>attached</goal>
+                            <goal>attached</goal>
                         </goals>
                         <configuration>
-                        <descriptors>
-                        <descriptor>
-                        ${basedir}/src/main/assembly/assembly-src.xml
-                        </descriptor>
-                        </descriptors>
-                        <finalName>symmetric-ds-${pom.version}</finalName>
+                            <descriptors>
+                                <descriptor>
+                                    ${basedir}/src/main/assembly/assembly-src.xml
+                                </descriptor>
+                            </descriptors>
+                            <finalName>symmetric-ds-${pom.version}</finalName>
                         </configuration>
-                        </execution>
-                    -->
+                    </execution>
+                     -->
                 </executions>
             </plugin>
             <plugin>
@@ -211,33 +211,6 @@
                 <configuration>
                     <siteDirectory>${basedir}/src/site</siteDirectory>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.agilejava.docbkx</groupId>
-                <artifactId>docbkx-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate-html</goal>
-                            <goal>generate-pdf</goal>
-                        </goals>
-                        <phase>pre-site</phase>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.docbook</groupId>
-                        <artifactId>docbook-xml</artifactId>
-                        <version>4.4</version>
-                        <scope>runtime</scope>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <sourceDirectory>${basedir}/src/docbook</sourceDirectory>
-                    <targetDirectory>${basedir}/target/site/guide</targetDirectory>
-                    <inputs>user-guide.xml</inputs>
-                    <chunkedOutput>false</chunkedOutput>
-                </configuration>                
             </plugin>
         </plugins>
     </build>
@@ -395,16 +368,6 @@
             <groupId>commons-math</groupId>
             <artifactId>commons-math</artifactId>
             <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-            <version>6.1.5</version>
         </dependency>
         <!-- Databases -->
         <dependency>
