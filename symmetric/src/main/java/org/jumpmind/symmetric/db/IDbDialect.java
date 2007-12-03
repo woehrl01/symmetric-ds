@@ -27,7 +27,6 @@ import org.jumpmind.symmetric.model.DataEventType;
 import org.jumpmind.symmetric.model.TriggerHistory;
 import org.jumpmind.symmetric.model.Trigger;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 
 public interface IDbDialect {
@@ -35,10 +34,7 @@ public interface IDbDialect {
     public void initTrigger(DataEventType dml, Trigger config,
             TriggerHistory audit, String tablePrefix, Table table);
 
-    @Deprecated
     public void removeTrigger(String schemaName, String triggerName);
-    
-    public void removeTrigger(String schemaName, String triggerName, String tableName);
 
     public void initConfigDb(String tablePrefix);
 
@@ -50,8 +46,8 @@ public interface IDbDialect {
 
     public boolean doesTriggerExist(String schema, String tableName, String triggerName);
 
-    public Table getMetaDataFor(String catalog, String schema, final String tableName, boolean useCache);
-    
+    public Table getMetaDataFor(String schema, final String tableName, boolean useCache);
+
     public String getTransactionTriggerExpression();
 
     public String createInitalLoadSqlFor(Node node, Trigger config);
@@ -68,14 +64,6 @@ public interface IDbDialect {
     
     public boolean isEmptyStringNulled();
     
-    public boolean supportsMixedCaseNamesInCatalog();
-    
-    public boolean supportsTransactionId();
-    
-    /**
-     * Implement this if the database has some type of cleanup functionality that needs to be 
-     * run when dropping database objects.  An example is Oracle's 'purge recyclebin'
-     */
     public void purge();
     
     public SQLErrorCodeSQLExceptionTranslator getSqlErrorTranslator();
@@ -88,19 +76,10 @@ public interface IDbDialect {
 
     public String getDefaultSchema();
     
-    public String getDefaultCatalog();
-    
     public int getStreamingResultsFetchSize();
     
     public JdbcTemplate getJdbcTemplate();
     
     public String getCreateSymmetricDDL();
-    
-    public String getSelectLastInsertIdSql(String sequenceName);
-    
-    public long insertWithGeneratedKey(final String sql, final String sequenceName);
-    
-    public long insertWithGeneratedKey(final String sql, final String sequenceName,
-            final PreparedStatementCallback psCallback);
     
 }

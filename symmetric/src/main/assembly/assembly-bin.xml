@@ -15,13 +15,6 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>src/test/resources</directory>
-      <outputDirectory>/bin</outputDirectory>
-      <includes>
-        <include>log4j.xml</include>
-      </includes>
-    </fileSet>    
-    <fileSet>
       <directory>src/main/deploy</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>

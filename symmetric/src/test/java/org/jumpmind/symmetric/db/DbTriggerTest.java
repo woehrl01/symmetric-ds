@@ -187,7 +187,7 @@ public class DbTriggerTest {
         }
     }
 
-    void validateTransactionFunctionailty(final SymmetricEngine engine)
+    void validateTransactionFunctionailty(SymmetricEngine engine)
             throws Exception {
         JdbcTemplate jdbcTemplate = getJdbcTemplate(engine);
         jdbcTemplate.execute(new ConnectionCallback() {
@@ -205,14 +205,9 @@ public class DbTriggerTest {
                         .executeQuery("select transaction_id from "
                                 + TestConstants.TEST_PREFIX
                                 + "data where transaction_id is not null group by transaction_id having count(*)>1");
-                String batchId = null;
-                if (rs.next()) {
-                    batchId = rs.getString(1);
-                }
-                IDbDialect dbDialect = (IDbDialect) engine.getApplicationContext().getBean(Constants.DB_DIALECT);
-                if (dbDialect.supportsTransactionId()) {
-                    Assert.assertNotNull(batchId);
-                }
+                rs.next();
+                String batchId = rs.getString(1);
+                assert (batchId != null);
                 stmt.close();
                 return null;
             }

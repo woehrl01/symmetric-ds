@@ -54,8 +54,7 @@ public class SymmetricEngineTestFactory {
     static final String ENGINE_2_PROPERTIES = "symmetric-mysql-engine-2.properties";
 
     static final String ORACLE_ENGINE_1_PROPERTIES = "symmetric-oracle-engine-1.properties";
-    
-    
+
     public static SymmetricEngine getMySqlTestEngine1(String engineScript) {
 
         if (mySqlEngine1 == null) {
@@ -147,9 +146,6 @@ public class SymmetricEngineTestFactory {
             platform.createTables(testDb, false, true);
             new SqlScript(getResource(TestConstants.TEST_DROP_ALL_SCRIPT), ds,
                     false).execute();
-            new SqlScript(getResource(TestConstants.TEST_DROP_SEQ_SCRIPT), ds,
-                    false).execute();
-
             // Need to init the table before running insert statements
             ((IBootstrapService) engine.getApplicationContext().getBean(
                     Constants.BOOTSTRAP_SERVICE)).init();
@@ -159,6 +155,18 @@ public class SymmetricEngineTestFactory {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void dropOracleSequences(SymmetricEngine engine) {
+        DataSource ds = (DataSource) engine.getApplicationContext().getBean(
+                Constants.DATA_SOURCE);
+        try {
+            new SqlScript(getResource(TestConstants.TEST_DROP_SEQ_SCRIPT), ds,
+                    false).execute();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private static URL getResource(String resource) {

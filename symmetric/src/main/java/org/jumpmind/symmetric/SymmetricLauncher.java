@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.nio.charset.Charset;
-import java.sql.Connection;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -36,7 +35,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.ddlutils.Platform;
 import org.apache.ddlutils.io.DatabaseIO;
@@ -51,8 +49,6 @@ import org.jumpmind.symmetric.service.IDataService;
 import org.jumpmind.symmetric.service.IRegistrationService;
 import org.jumpmind.symmetric.transport.IOutgoingTransport;
 import org.jumpmind.symmetric.transport.internal.InternalOutgoingTransport;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Run symmetric utilities and/or launch an embedded version of Symmetric.  If you run this
@@ -109,7 +105,6 @@ public class SymmetricLauncher {
                     throw new ParseException("Could not find the properties file specified: "
                             + line.getOptionValue(OPTION_PROPERTIES_FILE));
                 }
-                
             }
 
             if (line.hasOption(OPTION_DDL_GEN)) {
@@ -156,8 +151,7 @@ public class SymmetricLauncher {
                 loadBatch(new SymmetricEngine(), line.getOptionValue(OPTION_LOAD_BATCH));
             }
 
-            if (line.hasOption(OPTION_START_SERVER)) {    
-                testConnection();
+            if (line.hasOption(OPTION_START_SERVER)) {
                 new SymmetricWebServer().start(serverPort);
                 return;
             }
@@ -168,27 +162,14 @@ public class SymmetricLauncher {
             System.err.println(exp.getMessage());
             printHelp(options);
         } catch (Exception ex) {
-            System.err.println("-----------------------------------------------------------------------------------------------");
-            System.err.println("  An exception occurred.  Please see the following for details: ");            
-            System.err.println("-----------------------------------------------------------------------------------------------");
-            
-            ExceptionUtils.printRootCauseStackTrace(ex, System.err);
-            System.err.println("-----------------------------------------------------------------------------------------------");            
+            Throwable root = ExceptionUtils.getRootCause(ex);
+            System.err.println(root == null ? ex.getMessage() : root.getMessage());
             printHelp(options);
         }
     }
 
     private static void printHelp(Options options) {
         new HelpFormatter().printHelp("sym", options);
-    }
-    
-    
-    private static void testConnection() throws Exception {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] {"classpath:/symmetric-properties.xml","classpath:/symmetric-database.xml"});
-        BasicDataSource ds = (BasicDataSource)ctx.getBean(Constants.DATA_SOURCE);        
-        Connection c = ds.getConnection();
-        c.close();
-        ds.close();
     }
 
     private static Options buildOptions() {

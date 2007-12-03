@@ -71,7 +71,6 @@ abstract public class AbstractTest {
                 {
                     s.executeUpdate("delete from "+table);
                 }
-                s.close();
                 return null;
             }
             

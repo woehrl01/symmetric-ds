@@ -80,7 +80,9 @@ public class DataLoaderTest extends AbstractDataLoaderTest {
         values[2] = "two spaces after  ";
         values[3] = " one space before";
         values[4] = "one space after ";
-        testSimple(CsvConstants.INSERT, values, values);
+        String[] expectedValues = values.clone();
+        expectedValues[4] = translateExpectedCharString(expectedValues[4], 50);
+        testSimple(CsvConstants.INSERT, values, expectedValues);
     }
 
     @Test(groups="continuous")
@@ -88,7 +90,9 @@ public class DataLoaderTest extends AbstractDataLoaderTest {
         String[] values = new String[10];
         values[0] = getNextId();
         values[2] = values[4] = " ";
-        testSimple(CsvConstants.INSERT, values, values);
+        String[] expectedValues = values.clone();
+        expectedValues[4] = translateExpectedCharString(expectedValues[4], 50);
+        testSimple(CsvConstants.INSERT, values, expectedValues);
     }
 
     @Test(groups="continuous")
@@ -96,14 +100,20 @@ public class DataLoaderTest extends AbstractDataLoaderTest {
         String[] values = new String[10];
         values[0] = getNextId();
         values[1] = values[2] = values[3] = values[4] = "";
-        testSimple(CsvConstants.INSERT, values, values);
+        String[] expectedValues = values.clone();
+        expectedValues[2] = translateExpectedString(expectedValues[2]);
+        expectedValues[4] = translateExpectedCharString(expectedValues[4], 50);
+        testSimple(CsvConstants.INSERT, values, expectedValues);
     }
 
     @Test(groups="continuous")
     public void testStringNull() throws Exception {
         String[] values = new String[10];
         values[0] = getNextId();
-        testSimple(CsvConstants.INSERT, values, values);
+        String[] expectedValues = values.clone();
+        expectedValues[2] = expectedValues[4] = TableTemplate.REQUIRED_FIELD_NULL_SUBSTITUTE;
+        expectedValues[4] = translateExpectedCharString(expectedValues[4], 50);
+        testSimple(CsvConstants.INSERT, values, expectedValues);
     }
 
     @Test(groups="continuous")

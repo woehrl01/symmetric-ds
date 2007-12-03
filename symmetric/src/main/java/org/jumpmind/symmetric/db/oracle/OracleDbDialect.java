@@ -56,7 +56,7 @@ public class OracleDbDialect extends AbstractDbDialect implements IDbDialect {
     }
 
     private URL getTransactionIdSqlUrl() {
-        return getClass().getResource("/dialects/oracle-transactionid.sql");
+        return getClass().getResource("/oracle-transactionid.sql");
     }
 
     public boolean isFunctionUpToDate(String name) throws Exception {
@@ -94,20 +94,8 @@ public class OracleDbDialect extends AbstractDbDialect implements IDbDialect {
         }
     }
 
-    public void removeTrigger(String schemaName, String triggerName, String tableName) {
-        removeTrigger(schemaName, triggerName);
-    }
-    
     public String getTransactionTriggerExpression() {
         return TRANSACTION_ID_FUNCTION_NAME + "()";
-    }
-
-    public boolean supportsTransactionId() {
-        return true;
-    }
-
-    public String getSelectLastInsertIdSql(String sequenceName) {
-        return "select " + sequenceName + ".currval from dual')";
     }
 
     @Override
@@ -119,12 +107,9 @@ public class OracleDbDialect extends AbstractDbDialect implements IDbDialect {
                             new Object[] { triggerName, tableName }) > 0;
     }
 
-    public boolean supportsMixedCaseNamesInCatalog() {
-        return false;
-    }
-
     public void purge() {
         jdbcTemplate.update("purge recyclebin");
+
     }
 
     public void disableSyncTriggers() {

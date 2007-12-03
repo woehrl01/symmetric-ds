@@ -21,7 +21,6 @@
 
 package org.jumpmind.symmetric.load;
 
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -87,7 +86,7 @@ public class TableTemplate {
         this.dbDialect = dbDialect;
         this.columnFilter = columnFilter;
         // TODO should we be passing the schema in the csv?
-        table = dbDialect.getMetaDataFor(null, null, tableName, true);
+        table = dbDialect.getMetaDataFor(null, tableName, true);
         allMetaData = new HashMap<String, Column>();
         statementMap = new HashMap<DmlType, StatementBuilder>();
 
@@ -158,26 +157,25 @@ public class TableTemplate {
 
             if (column != null) {
                 int type = column.getTypeCode();
+                // TODO: should there be defaults for date and numeric types?
                 if ((value == null || (dbDialect.isEmptyStringNulled() && value
                         .equals("")))
                         && column.isRequired() && column.isOfTextType()) {
                     objectValue = REQUIRED_FIELD_NULL_SUBSTITUTE;
-                } else if (value != null) {
-                    if (type == Types.DATE) {
-                        objectValue = new Date(getTime(value, TIMESTAMP_PATTERNS));
-                    } else if (type == Types.TIMESTAMP) {
-                        objectValue = new Timestamp(getTime(value, TIMESTAMP_PATTERNS));
-                    } else if (type == Types.CHAR && dbDialect.isCharSpacePadded()) {
-                        objectValue = StringUtils.rightPad(value.toString(), column.getSizeAsInt(), ' ');
-                    } else if (type == Types.INTEGER || type == Types.SMALLINT) {
-                        objectValue = Integer.valueOf(value);
-                    } else if (type == Types.NUMERIC || type == Types.DECIMAL) {
-                        objectValue = new BigDecimal(value);
-                    } else if (type == Types.BLOB || type == Types.LONGVARBINARY) {
-                        objectValue = value.getBytes();
-                    } else if (type == Types.TIME) {
-                        objectValue = new Time(getTime(value, TIMESTAMP_PATTERNS));
-                    }                
+                } else if (value != null && type == Types.DATE) {
+                    objectValue = new Date(getTime(value, TIMESTAMP_PATTERNS));
+                } else if (value != null && type == Types.TIMESTAMP) {
+                    objectValue = new Timestamp(getTime(value,
+                            TIMESTAMP_PATTERNS));
+                } else if (value != null && type == Types.CHAR
+                        && dbDialect.isCharSpacePadded()) {
+                    objectValue = StringUtils.rightPad(value.toString(), column
+                            .getSizeAsInt(), ' ');
+                } else if (value != null
+                        && (type == Types.BLOB || type == Types.LONGVARBINARY)) {
+                    objectValue = value.getBytes();
+                } else if (value != null && type == Types.TIME) {
+                    objectValue = new Time(getTime(value, TIMESTAMP_PATTERNS));
                 }
                 list.add(objectValue);
             }

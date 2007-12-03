@@ -112,7 +112,7 @@
     </distributionManagement>
     <properties>
         <surefire-report-release-version>2.4-collab-SNAPSHOT</surefire-report-release-version>
-        <springframework-release-version>2.0.7</springframework-release-version>
+        <springframework-release-version>2.0.5</springframework-release-version>
         <docbook.source>${basedir}/src/docbook</docbook.source>
         <docbook.target>${basedir}/target/site/guide</docbook.target>
     </properties>
@@ -224,98 +224,43 @@
                 <artifactId>docbkx-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>build-pdf-doc</id>
                         <phase>pre-site</phase>
                         <goals>
                             <goal>generate-pdf</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${docbook.source}</sourceDirectory>
-                            <targetDirectory>${docbook.target}/pdf</targetDirectory>
-                            <xincludeSupported>true</xincludeSupported>
-                            <includes>*.xml</includes>
-                            <imgSrcPath>${docbook.source}/images</imgSrcPath>
-                            <admonGraphicsPath>
-                                ${docbook.source}/resources/images/admons/
-                            </admonGraphicsPath>
-                            <foCustomization>
-                                ${docbook.source}/resources/xsl/docbook-fopdf.xsl
-                            </foCustomization>
-                        </configuration>                        
-                    </execution>
-                    
-                    <execution>
-                        <id>build-singlehtml-doc</id>
-                        <phase>pre-site</phase>
-                        <goals>
                             <goal>generate-html</goal>
                         </goals>
-                        <configuration>
-                            <sourceDirectory>${docbook.source}</sourceDirectory>
-                            <targetDirectory>${docbook.target}/html-single</targetDirectory>
-                            <xincludeSupported>true</xincludeSupported>
-                            <includes>*.xml</includes>
-                            <htmlStylesheet>css/docbook-style.css</htmlStylesheet>
-                            <htmlCustomization>
-                                ${docbook.source}/resources/xsl/docbook-html.xsl
-                            </htmlCustomization>
-                            <chunkedOutput>false</chunkedOutput>
-                            <postProcess>
-                                <copy todir="${docbook.target}/html-single">
-                                    <fileset dir="${docbook.source}/resources">
-                                        <include name="images/*.png" />
-                                        <include name="images/*.gif" />
-                                        <include name="images/*.jpg" />
-                                    </fileset>
-                                    <fileset dir="${docbook.source}/resources">
-                                        <include name="css/*.css" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${docbook.target}/html-single/images" flatten="true">
-                                    <fileset dir="${docbook.source}">
-                                        <include name="**/images/*" />
-                                    </fileset>
-                                </copy>
-                            </postProcess>
-                        </configuration>                        
-                    </execution>
-                    
-                    <execution>
-                        <id>build-chunkedhtml-doc</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>generate-html</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${docbook.source}</sourceDirectory>
-                            <targetDirectory>${docbook.target}/html</targetDirectory>
-                            <xincludeSupported>true</xincludeSupported>
-                            <includes>*.xml</includes>
-                            <htmlStylesheet>css/docbook-style.css</htmlStylesheet>
-                            <htmlCustomization>
-                                ${docbook.source}/resources/xsl/docbook-html-chunk.xsl
-                            </htmlCustomization>
-                            <chunkedOutput>true</chunkedOutput>
-                            <postProcess>
-                                <copy todir="${docbook.target}/html">
-                                    <fileset dir="${docbook.source}/resources">
-                                        <include name="images/*.png" />
-                                        <include name="images/*.gif" />
-                                        <include name="images/*.jpg" />
-                                    </fileset>
-                                    <fileset dir="${docbook.source}/resources">
-                                        <include name="css/*.css" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${docbook.target}/html/images" flatten="true">
-                                    <fileset dir="${docbook.source}">
-                                        <include name="**/images/*" />
-                                    </fileset>
-                                </copy>
-                            </postProcess>
-                        </configuration>                        
                     </execution>
                 </executions>
+                <configuration>
+                    <sourceDirectory>${docbook.source}</sourceDirectory>
+                    <targetDirectory>${docbook.target}</targetDirectory>
+                    <xincludeSupported>true</xincludeSupported>
+                    <includes>*.xml</includes>
+                    <!-- <imgSrcPath>${docbook.source}/images</imgSrcPath> -->
+                    <admonGraphicsPath>${docbook.source}/resources/images/admons/</admonGraphicsPath>
+                    <foCustomization>${docbook.source}/resources/xsl/docbook-fopdf.xsl</foCustomization>
+                    
+                    <chunkedOutput>false</chunkedOutput>
+                    <htmlStylesheet>css/docbook-style.css</htmlStylesheet>
+                    <htmlCustomization>${docbook.source}/resources/xsl/docbook-html.xsl</htmlCustomization>
+                    <postProcess>
+                        <copy todir="${docbook.target}">
+                            <fileset dir="${docbook.source}/resources">
+                                <include name="images/*.png" />
+                                <include name="images/*.gif" />
+                                <include name="images/*.jpg" />
+                            </fileset>
+                            <fileset dir="${docbook.source}/resources">
+                                <include name="css/*.css" />
+                            </fileset>
+                        </copy>
+                        <copy todir="${docbook.target}/images" flatten="true">
+                            <fileset dir="${docbook.source}">
+                                <include name="**/images/*" />
+                            </fileset>
+                        </copy>
+                    </postProcess>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.docbook</groupId>
@@ -406,6 +351,7 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
+            <scope>test</scope>
         </dependency>
         <!-- Spring Framework -->
         <dependency>
@@ -485,17 +431,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.5</version>
-        </dependency>
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>8.2-504.jdbc3</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.jtds</groupId>
-            <artifactId>jtds</artifactId>
-            <version>1.2.2</version>
+            <version>5.0.5</version>
         </dependency>
     </dependencies>
 </project>

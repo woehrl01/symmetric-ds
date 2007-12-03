@@ -21,8 +21,6 @@
 package org.jumpmind.symmetric.db.mysql;
 
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -54,7 +52,7 @@ public class MySqlDbDialect extends AbstractDbDialect implements IDbDialect {
     }
 
     private URL getTransactionIdSqlUrl() {
-        return getClass().getResource("/dialects/mysql-transactionid.sql");
+        return getClass().getResource("/mysql-transactionid.sql");
     }
 
     public boolean isFunctionUpToDate(String name) throws Exception {
@@ -94,10 +92,6 @@ public class MySqlDbDialect extends AbstractDbDialect implements IDbDialect {
             logger.warn("Trigger does not exist");
         }
     }
-    
-    public void removeTrigger(String schemaName, String triggerName, String tableName) {
-        removeTrigger(schemaName, triggerName);
-    }
 
     public void disableSyncTriggers() {
         jdbcTemplate.update("set " + SYNC_TRIGGERS_DISABLED_USER_VARIABLE
@@ -117,14 +111,6 @@ public class MySqlDbDialect extends AbstractDbDialect implements IDbDialect {
         return getDefaultSchema() + "." + TRANSACTION_ID_FUNCTION_NAME + "()";
     }
 
-    public boolean supportsTransactionId() {
-        return true;
-    }
-    
-    public String getSelectLastInsertIdSql(String sequenceName) {
-        return "select last_insert_id()";
-    }
-
     public boolean isCharSpacePadded() {
         return false;
     }
@@ -137,10 +123,6 @@ public class MySqlDbDialect extends AbstractDbDialect implements IDbDialect {
         return false;
     }
 
-    public boolean supportsMixedCaseNamesInCatalog() {
-        return true;
-    }
-
     public void purge() {
     }
 
@@ -148,12 +130,6 @@ public class MySqlDbDialect extends AbstractDbDialect implements IDbDialect {
         return (String) jdbcTemplate.queryForObject("select database()",
                 String.class);
     }
-    
-    protected String switchSchemasForTriggerInstall(String schema, Connection c) throws SQLException {
-        String previousCatalog = c.getCatalog();
-        c.setCatalog(schema);
-        return previousCatalog;
-    }    
 
     /**
      * According to the documentation (and experience) the jdbc driver for mysql requires the 

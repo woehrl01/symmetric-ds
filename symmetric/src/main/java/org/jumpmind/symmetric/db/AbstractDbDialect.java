@@ -25,7 +25,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -53,7 +52,6 @@ import org.jumpmind.symmetric.model.TriggerHistory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 
@@ -77,8 +75,6 @@ abstract public class AbstractDbDialect implements IDbDialect {
 
     private int streamingResultsFetchSize;
 
-    private Boolean supportsGetGeneratedKeys;
-
     protected AbstractDbDialect() {
         _defaultSizes = new HashMap<Integer, String>();
         _defaultSizes.put(new Integer(1), "254");
@@ -94,14 +90,7 @@ abstract public class AbstractDbDialect implements IDbDialect {
         _defaultSizes.put(new Integer(8), "15,0");
         _defaultSizes.put(new Integer(3), "15,15");
         _defaultSizes.put(new Integer(2), "15,15");
-    }
 
-    protected boolean allowsNullForIdentityColumn() {
-        return true;
-    }
-
-    public String getDefaultCatalog() {
-        return getDefaultSchema();
     }
 
     public void init(Platform pf) {
@@ -134,8 +123,7 @@ abstract public class AbstractDbDialect implements IDbDialect {
 
     public String createInitalLoadSqlFor(Node node, Trigger config) {
         return sqlTemplate.createInitalLoadSql(node, this, config,
-                getMetaDataFor(getDefaultCatalog(), config.getSourceSchemaName(), config.getSourceTableName(), true))
-                .trim();
+                getMetaDataFor(config.getSourceSchemaName(), config.getSourceTableName(), true)).trim();
     }
 
     public String createPurgeSqlFor(Node node, Trigger trig) {
@@ -144,14 +132,12 @@ abstract public class AbstractDbDialect implements IDbDialect {
 
     public String createCsvDataSql(Trigger trig, String whereClause) {
         return sqlTemplate.createCsvDataSql(trig,
-                getMetaDataFor(getDefaultCatalog(), trig.getSourceSchemaName(), trig.getSourceTableName(), true),
-                whereClause).trim();
+                getMetaDataFor(trig.getSourceSchemaName(), trig.getSourceTableName(), true), whereClause).trim();
     }
 
     public String createCsvPrimaryKeySql(Trigger trig, String whereClause) {
         return sqlTemplate.createCsvPrimaryKeySql(trig,
-                getMetaDataFor(getDefaultCatalog(), trig.getSourceSchemaName(), trig.getSourceTableName(), true),
-                whereClause).trim();
+                getMetaDataFor(trig.getSourceSchemaName(), trig.getSourceTableName(), true), whereClause).trim();
     }
 
     /**
@@ -161,12 +147,13 @@ abstract public class AbstractDbDialect implements IDbDialect {
      * Dialect may optionally override this method to more efficiently lookup up table metadata
      * directly against information schemas. 
      */
-    public Table getMetaDataFor(String catalog, String schema, String tableName, boolean useCache) {
+    public Table getMetaDataFor(String schema, String tbNm, boolean useCache) {
+        final String tableName = tbNm.toUpperCase();
         Table retTable = cachedModel.findTable(tableName);
         if (retTable == null || !useCache) {
             synchronized (this.getClass()) {
                 try {
-                    Table table = findTable(catalog, checkSchema(schema), tableName);
+                    Table table = findTable(checkSchema(schema), tableName);
 
                     if (retTable != null) {
                         cachedModel.removeTable(retTable);
@@ -188,24 +175,20 @@ abstract public class AbstractDbDialect implements IDbDialect {
     }
 
     private String checkSchema(String schema) {
-        return (schema == null || schema.trim().length() == 0) ? null : schema;
+        return (schema == null || schema.trim().length() == 0) ? null : schema.toUpperCase();
     }
 
-    public Table findTable(String _catalog, String _schema, final String _tableName) throws Exception {
+    public Table findTable(String _schema, String _tableName) throws Exception {
         final String schema = checkSchema(_schema);
-        final String catalog = _catalog;
+        final String tableName = _tableName.toUpperCase();
         return (Table) jdbcTemplate.execute(new ConnectionCallback() {
             public Object doInConnection(Connection c) throws SQLException, DataAccessException {
                 Table table = null;
                 DatabaseMetaDataWrapper metaData = new DatabaseMetaDataWrapper();
                 metaData.setMetaData(c.getMetaData());
-                metaData.setCatalog(catalog);
+                metaData.setCatalog(schema);
                 metaData.setSchemaPattern(schema);
                 metaData.setTableTypes(null);
-                String tableName = _tableName;
-                if (!supportsMixedCaseNamesInCatalog()) {
-                    tableName = _tableName.toUpperCase();
-                }
                 ResultSet tableData = metaData.getTables(tableName);
                 while (tableData != null && tableData.next()) {
                     Map<String, Object> values = readColumns(tableData, initColumnsForTable());
@@ -346,30 +329,20 @@ abstract public class AbstractDbDialect implements IDbDialect {
             final String tablePrefix, final Table table) {
         jdbcTemplate.execute(new ConnectionCallback() {
             public Object doInConnection(Connection con) throws SQLException, DataAccessException {
-                String previousSourceSchema = trigger.getSourceSchemaName();
+                String catalog = trigger.getSourceSchemaName();
                 logger.info("Creating " + dml.toString() + " trigger for "
-                        + (previousSourceSchema != null ? (previousSourceSchema + ".") : "")
-                        + trigger.getSourceTableName());
-                String previousCatalog = null;
+                        + (catalog != null ? (catalog + ".") : "") + trigger.getSourceTableName());
+                String previousCatalog = con.getCatalog();
                 try {
-                    previousCatalog = switchSchemasForTriggerInstall(previousSourceSchema, con);
+                    if (catalog != null) {
+                        con.setCatalog(catalog);
+                    }
                     Statement stmt = con.createStatement();
-                    String triggerSql = createTriggerDDL(dml, trigger, audit, tablePrefix, table);
-                    try {
-                        stmt.executeUpdate(triggerSql);
-                    } catch (SQLException ex) {
-                        logger.error("Failed to create trigger: " + triggerSql);
-                        throw ex;
-                    }
-                    String postTriggerDml = createPostTriggerDDL(dml, trigger, audit, tablePrefix, table);
-                    if (postTriggerDml != null) {
-                        stmt.executeUpdate(postTriggerDml);
-                    }
+                    stmt.executeUpdate(createTriggerDDL(dml, trigger, audit, tablePrefix, table));
                     stmt.close();
-
                 } finally {
-                    if (previousSourceSchema != null && !previousSourceSchema.equalsIgnoreCase(previousCatalog)) {
-                        switchSchemasForTriggerInstall(previousCatalog, con);
+                    if (catalog != null && !catalog.equalsIgnoreCase(previousCatalog)) {
+                        con.setCatalog(previousCatalog);
                     }
                 }
                 return null;
@@ -377,30 +350,18 @@ abstract public class AbstractDbDialect implements IDbDialect {
         });
     }
 
-    /**
-     * Provide the option switch a connection's schema for trigger installation.
-     */
-    protected String switchSchemasForTriggerInstall(String schema, Connection c) throws SQLException {
-        return null;
-    }
-
     public String createTriggerDDL(DataEventType dml, Trigger config, TriggerHistory audit, String tablePrefix,
             Table table) {
         return sqlTemplate.createTriggerDDL(this, dml, config, audit, tablePrefix, table, getDefaultSchema());
     }
-
-    public String createPostTriggerDDL(DataEventType dml, Trigger config, TriggerHistory audit, String tablePrefix,
-            Table table) {
-        return sqlTemplate.createPostTriggerDDL(this, dml, config, audit, tablePrefix, table, getDefaultSchema());
-    }
-
+    
     public String getCreateSymmetricDDL() {
         Database db = getConfigDdlDatabase();
         prefixConfigDatabase(db);
         return platform.getCreateTablesSql(db, true, true);
     }
-
-    protected boolean prefixConfigDatabase(Database targetTables) {
+    
+    protected boolean prefixConfigDatabase(Database targetTables)  {
         try {
             String tblPrefix = this.tablePrefix.toLowerCase() + "_";
 
@@ -411,11 +372,11 @@ abstract public class AbstractDbDialect implements IDbDialect {
                 table.setName(tblPrefix + table.getName().toLowerCase());
                 fixForeignKeys(table, tblPrefix, false);
 
-                if (getMetaDataFor(getDefaultCatalog(), getDefaultSchema(), table.getName(), false) == null) {
+                if (getMetaDataFor(getDefaultSchema(), table.getName().toUpperCase(), false) == null) {
                     createTables = true;
                 }
             }
-
+            
             return createTables;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
@@ -484,73 +445,6 @@ abstract public class AbstractDbDialect implements IDbDialect {
                 return meta.getDatabaseMajorVersion() + "." + meta.getDatabaseMinorVersion();
             }
         });
-    }
-
-    public boolean supportsGetGeneratedKeys() {
-        if (supportsGetGeneratedKeys == null) {
-            supportsGetGeneratedKeys = (Boolean) jdbcTemplate.execute(new ConnectionCallback() {
-                public Object doInConnection(Connection conn) throws SQLException, DataAccessException {
-                    return conn.getMetaData().supportsGetGeneratedKeys();
-                }
-            });
-        }
-        return supportsGetGeneratedKeys;
-    }
-
-    public String getSelectLastInsertIdSql(String sequenceName) {
-        throw new UnsupportedOperationException();
-    }
-
-    public long insertWithGeneratedKey(final String sql, final String sequenceName) {
-        return insertWithGeneratedKey(sql, sequenceName, null);
-    }
-
-    public long insertWithGeneratedKey(final String sql, final String sequenceName,
-            final PreparedStatementCallback callback) {
-        return (Long) jdbcTemplate.execute(new ConnectionCallback() {
-            public Object doInConnection(Connection conn) throws SQLException, DataAccessException {
-                long key = 0;
-                PreparedStatement ps = null;
-                boolean supportsGetGeneratedKeys = supportsGetGeneratedKeys();
-                if (allowsNullForIdentityColumn()) {
-                    ps = conn.prepareStatement(sql, new int[] { 1 });
-                } else {
-                    String replaceSql = sql.replaceFirst("\\(\\w*,", "(").replaceFirst("\\(null,", "(");
-                    if (supportsGetGeneratedKeys) {
-                        ps = conn.prepareStatement(replaceSql, Statement.RETURN_GENERATED_KEYS);
-                    } else {
-                        ps = conn.prepareStatement(replaceSql);
-                    }
-                }
-                ps.setQueryTimeout(jdbcTemplate.getQueryTimeout());
-                if (callback != null) {
-                    callback.doInPreparedStatement(ps);
-                }
-                ps.executeUpdate();
-
-                if (supportsGetGeneratedKeys) {
-                    ResultSet rs = ps.getGeneratedKeys();
-                    if (rs.next()) {
-                        key = rs.getLong(1);
-                    }
-                    JdbcUtils.closeResultSet(rs);
-                } else {
-                    Statement st = conn.createStatement();
-                    ResultSet rs = st.executeQuery(getSelectLastInsertIdSql(sequenceName));
-                    if (rs.next()) {
-                        key = rs.getLong(1);
-                    }
-                    JdbcUtils.closeResultSet(rs);
-                    JdbcUtils.closeStatement(st);
-                }
-                JdbcUtils.closeStatement(ps);
-                return key;
-            }
-        });
-    }
-
-    public boolean supportsTransactionId() {
-        return false;
     }
 
     public void setSqlTemplate(SqlTemplate sqlTemplate) {
