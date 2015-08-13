@@ -35,7 +35,7 @@ import org.jumpmind.symmetric.ITypedPropertiesFactory;
 import org.jumpmind.symmetric.common.ParameterConstants;
 import org.jumpmind.symmetric.config.IParameterFilter;
 import org.jumpmind.symmetric.config.IParameterSaveFilter;
-import org.jumpmind.symmetric.model.DatabaseParameter;
+import org.jumpmind.symmetric.model.Parameter;
 import org.jumpmind.symmetric.service.IParameterService;
 
 /**
@@ -173,7 +173,7 @@ public class ParameterService extends AbstractParameterService implements IParam
         return p;
     }
 
-    public List<DatabaseParameter> getDatabaseParametersFor(String paramKey) {
+    public List<Parameter> getDatabaseParametersFor(String paramKey) {
         return sqlTemplate.query(sql.getSql("selectParametersByKeySql"),
                 new DatabaseParameterMapper(), paramKey);
     }
@@ -182,15 +182,15 @@ public class ParameterService extends AbstractParameterService implements IParam
         return readParametersFromDatabase("selectParametersSql", externalId, nodeGroupId);
     }
 
-    class DatabaseParameterMapper implements ISqlRowMapper<DatabaseParameter> {
+    class DatabaseParameterMapper implements ISqlRowMapper<Parameter> {
         IParameterFilter filter = extensionService != null ? extensionService.getExtensionPoint(IParameterFilter.class) : null;
-        public DatabaseParameter mapRow(Row row) {
+        public Parameter mapRow(Row row) {
             String key = row.getString("param_key");
             String value = row.getString("param_value");
             if (filter != null) {
                 value = filter.filterParameter(key, value);
             }           
-            return new DatabaseParameter(key, value, row.getString("external_id"), row.getString("node_group_id"));
+            return new Parameter(key, value, row.getString("external_id"), row.getString("node_group_id"));
         }
     }
 

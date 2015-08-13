@@ -1,4 +1,4 @@
-package org.jumpmind.db.persist;
+package org.jumpmind.db.sql;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,17 +13,14 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.jumpmind.db.model.Column;
 import org.jumpmind.db.model.Table;
 import org.jumpmind.db.platform.IDatabasePlatform;
-import org.jumpmind.db.sql.DmlStatement;
 import org.jumpmind.db.sql.DmlStatement.DmlType;
-import org.jumpmind.db.sql.Row;
-import org.jumpmind.db.sql.SqlException;
 import org.jumpmind.persist.AbstractPersistenceManager;
 
-public class JdbcPersistenceManager extends AbstractPersistenceManager {
+public class SqlPersistenceManager extends AbstractPersistenceManager {
 
     IDatabasePlatform databasePlatform;
 
-    public JdbcPersistenceManager(IDatabasePlatform databasePlatform) {
+    public SqlPersistenceManager(IDatabasePlatform databasePlatform) {
         this.databasePlatform = databasePlatform;
     }
 

@@ -268,10 +268,10 @@ abstract public class AbstractSymmetricEngine implements ISymmetricEngine {
         this.platform = createDatabasePlatform(properties);
 
         this.parameterService = new ParameterService(platform, propertiesFactory,
-                properties.get(ParameterConstants.RUNTIME_CONFIG_TABLE_PREFIX, "sym"));
+                properties.get(ParameterConstants.TABLE_PREFIX, "sym"));
 
         boolean parameterTableExists = this.platform.readTableFromDatabase(null, null, 
-                TableConstants.getTableName(properties.get(ParameterConstants.RUNTIME_CONFIG_TABLE_PREFIX), TableConstants.SYM_PARAMETER)) != null;
+                TableConstants.getTableName(properties.get(ParameterConstants.TABLE_PREFIX), TableConstants.SYM_PARAMETER)) != null;
         if (parameterTableExists) {
             this.parameterService.setDatabaseHasBeenInitialized(true);
             this.parameterService.rereadParameters();

@@ -148,7 +148,7 @@ public class DbFillCommand extends AbstractCommandLauncher {
         // Ignore the Symmetric config tables.
         getSymmetricEngine();
         IParameterService parameterService = engine.getParameterService();
-        String cfgPrefix = parameterService.getString(ParameterConstants.RUNTIME_CONFIG_TABLE_PREFIX);
+        String cfgPrefix = parameterService.getString(ParameterConstants.TABLE_PREFIX);
         dbFill.setIgnore((String[])ArrayUtils.add(ignore, cfgPrefix));
         dbFill.setPrefixed(prefixed);
         

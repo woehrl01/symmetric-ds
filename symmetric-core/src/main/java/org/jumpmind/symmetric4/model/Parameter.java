@@ -18,49 +18,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.jumpmind.symmetric.model;
-
-import java.io.Serializable;
+package org.jumpmind.symmetric4.model;
 
 import org.jumpmind.symmetric.common.ParameterConstants;
 
-public class DatabaseParameter implements Serializable {
+public class Parameter extends AbstractObject {
 
     private static final long serialVersionUID = 1L;
 
-    private String key;
-    private String value;
+    private String paramKey;
+    private String paramValue;
     private String externalId = ParameterConstants.ALL;
     private String nodeGroupId = ParameterConstants.ALL;
 
-    public DatabaseParameter() {
+    public Parameter() {
     }
     
-    public DatabaseParameter(String key) {
-        this.key = key;
+    public Parameter(String key) {
+        this.paramKey = key;
     }
 
-    public DatabaseParameter(String key, String value, String externalId, String nodeGroupId) {
-        this.key = key;
-        this.value = value;
+    public Parameter(String key, String value, String externalId, String nodeGroupId) {
+        this.paramKey = key;
+        this.paramValue = value;
         this.externalId = externalId;
         this.nodeGroupId = nodeGroupId;
     }
 
-    public String getKey() {
-        return key;
+    public String getParamKey() {
+        return paramKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setParamKey(String key) {
+        this.paramKey = key;
     }
 
-    public String getValue() {
-        return value;
+    public String getParamValue() {
+        return paramValue;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setParamValue(String value) {
+        this.paramValue = value;
     }
 
     public String getExternalId() {
@@ -77,6 +75,11 @@ public class DatabaseParameter implements Serializable {
 
     public void setNodeGroupId(String nodeGroupId) {
         this.nodeGroupId = nodeGroupId;
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s:%s:%s", externalId, nodeGroupId, paramKey);
     }
 
 }

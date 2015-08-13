@@ -37,9 +37,9 @@ public class KeyedCache<K, T> implements Serializable {
 
     protected LinkedHashMap<K, T> keyedCache = new LinkedHashMap<K, T>();
 
-    protected IRefreshCache<K, T> refresher;
+    protected ICacheRefresher<K, T> refresher;
 
-    public KeyedCache(long timeoutTimeInMs, IRefreshCache<K, T> refresher) {
+    public KeyedCache(long timeoutTimeInMs, ICacheRefresher<K, T> refresher) {
         this.timeoutTimeInMs = timeoutTimeInMs;
         this.refresher = refresher;
     }
@@ -79,7 +79,7 @@ public class KeyedCache<K, T> implements Serializable {
         lastRefreshTimeMs = System.currentTimeMillis();
     }
 
-    public interface IRefreshCache<K, T> {
+    public interface ICacheRefresher<K, T> {
         public LinkedHashMap<K, T> refresh();
     }
 

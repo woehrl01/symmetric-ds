@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jumpmind.properties.TypedProperties;
-import org.jumpmind.symmetric.model.DatabaseParameter;
+import org.jumpmind.symmetric.model.Parameter;
 
 /**
  * Get and set application wide configuration information.
@@ -68,7 +68,7 @@ public interface IParameterService {
 
     public Date getLastTimeParameterWereCached();
     
-    public List<DatabaseParameter> getDatabaseParametersFor(String paramKey);
+    public List<Parameter> getDatabaseParametersFor(String paramKey);
     
     public TypedProperties getDatabaseParameters(String externalId, String nodeGroupId);
 

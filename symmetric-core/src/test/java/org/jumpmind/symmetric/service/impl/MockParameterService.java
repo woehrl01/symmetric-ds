@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.jumpmind.properties.TypedProperties;
-import org.jumpmind.symmetric.model.DatabaseParameter;
+import org.jumpmind.symmetric.model.Parameter;
 import org.jumpmind.symmetric.service.IParameterService;
 
 public class MockParameterService extends AbstractParameterService implements IParameterService {
@@ -73,7 +73,7 @@ public class MockParameterService extends AbstractParameterService implements IP
     public void deleteParameter(String externalId, String nodeGroupId, String key) {
     }
 
-    public List<DatabaseParameter> getDatabaseParametersFor(String paramKey) {
+    public List<Parameter> getDatabaseParametersFor(String paramKey) {
         return null;
     }
 

@@ -88,7 +88,7 @@ public class ExtensionService extends AbstractService implements IExtensionServi
             }
         }
 
-        String prefix = parameterService.getString(ParameterConstants.RUNTIME_CONFIG_TABLE_PREFIX);
+        String prefix = parameterService.getString(ParameterConstants.TABLE_PREFIX);
         if (platform.getTableFromCache(TableConstants.getTableName(prefix, TableConstants.SYM_EXTENSION), false) != null) {
             List<Extension> extensionList = sqlTemplate.query(getSql("selectEnabled"), new ExtensionRowMapper(), parameterService.getNodeGroupId());
             log.info("Found {} extension points from the database that will be registered", extensionList.size());

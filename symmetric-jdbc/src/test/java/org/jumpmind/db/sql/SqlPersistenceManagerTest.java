@@ -1,4 +1,4 @@
-package org.jumpmind.db.persist;
+package org.jumpmind.db.sql;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -19,6 +19,7 @@ import org.jumpmind.db.model.Table;
 import org.jumpmind.db.platform.IDatabasePlatform;
 import org.jumpmind.db.platform.JdbcDatabasePlatformFactory;
 import org.jumpmind.db.sql.ISqlTemplate;
+import org.jumpmind.db.sql.SqlPersistenceManager;
 import org.jumpmind.db.sql.Row;
 import org.jumpmind.db.sql.SqlTemplateSettings;
 import org.jumpmind.db.util.BasicDataSourceFactory;
@@ -29,15 +30,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JdbcPersistenceManagerTest {
+public class SqlPersistenceManagerTest {
 
-    JdbcPersistenceManager manager;
+    SqlPersistenceManager manager;
 
     Table testTableA;
 
     @Before
     public void setup() throws Exception {
-        manager = new JdbcPersistenceManager(createDatabasePlatform());
+        manager = new SqlPersistenceManager(createDatabasePlatform());
 
         testTableA = new Table("A");
         testTableA.addColumn(new Column("ID", true, Types.INTEGER, -1, -1));
