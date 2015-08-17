@@ -322,9 +322,7 @@ public class OracleBulkDatabaseWriter extends DefaultDatabaseWriter {
             ddl.append(String.format("    end loop;                                                               \n"));       
             ddl.append(String.format("end %s;                                                      ", procedureName));
           
-            if (log.isDebugEnabled()) {
-                log.debug(ddl.toString());
-            }
+            log.info("Building bulk stored procedure:\n{}", ddl.toString());
             platform.getSqlTemplate().update(ddl.toString());
         }
     }   

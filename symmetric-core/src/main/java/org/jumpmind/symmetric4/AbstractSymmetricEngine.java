@@ -10,13 +10,12 @@ import org.jumpmind.properties.TypedProperties;
 import org.jumpmind.security.ISecurityService;
 import org.jumpmind.security.SecurityServiceFactory;
 import org.jumpmind.security.SecurityServiceFactory.SecurityServiceType;
-import org.jumpmind.symmetric.EngineAlreadyRegisteredException;
 import org.jumpmind.symmetric.ITypedPropertiesFactory;
 import org.jumpmind.symmetric.common.ParameterConstants;
 import org.jumpmind.symmetric.db.ISymmetricDialect;
-import org.jumpmind.symmetric.service.IExtensionService;
 import org.jumpmind.symmetric4.job.JobManager;
 import org.jumpmind.symmetric4.service.ConfigurationService;
+import org.jumpmind.symmetric4.service.ExtensionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -47,7 +46,9 @@ public abstract class AbstractSymmetricEngine implements ISymmetricEngine {
     protected ISymmetricDialect symmetricDialect;
 
     protected ConfigurationService configurationService;
-    
+
+    protected ExtensionService extensionService;
+
     protected JobManager jobManager;
 
     protected AbstractSymmetricEngine(boolean registerEngine) {
@@ -67,12 +68,16 @@ public abstract class AbstractSymmetricEngine implements ISymmetricEngine {
 
         MDC.put("engineName", properties.get(ParameterConstants.ENGINE_NAME));
 
+        String tablePrefix = properties.get(ParameterConstants.TABLE_PREFIX);
+        long cacheTimeout = properties.getLong(ParameterConstants.CACHE_TIMEOUT_CHANNEL_IN_MS);
+
         this.platform = createDatabasePlatform(properties);
-        this.configurationService = new ConfigurationService(propertiesFactory,
-                properties.get(ParameterConstants.TABLE_PREFIX),
-                properties.getInt(ParameterConstants.CACHE_TIMEOUT_CHANNEL_IN_MS), platform);
-        this.jobManager = new JobManager();
-        
+
+        this.configurationService = new ConfigurationService(propertiesFactory, tablePrefix, cacheTimeout, platform);
+
+        this.extensionService = new ExtensionService(tablePrefix, cacheTimeout, platform);
+
+        this.jobManager = new JobManager(configurationService);
 
         if (registerEngine) {
             registerEngine();
@@ -95,7 +100,7 @@ public abstract class AbstractSymmetricEngine implements ISymmetricEngine {
 
     abstract protected ISymmetricDialect createSymmetricDialect();
 
-    abstract protected IExtensionService createExtensionService();
+    abstract protected ExtensionService createExtensionService();
 
     abstract protected JobManager createJobManager();
 
@@ -106,23 +111,25 @@ public abstract class AbstractSymmetricEngine implements ISymmetricEngine {
      * @see #findEngineByUrl(String)
      */
     private void registerEngine() {
-//        String url = getSyncUrl();
-//        ISymmetricEngine alreadyRegister = registeredEnginesByUrl.get(url);
-//        if (alreadyRegister == null || alreadyRegister.equals(this)) {
-//            if (url != null) {
-//                registeredEnginesByUrl.put(url, this);
-//            }
-//        } else {
-//            log.warn("Could not register engine.  There was already an engine registered under the url: {}", getSyncUrl());
-//        }
-//
-//        alreadyRegister = registeredEnginesByName.get(getEngineName());
-//        if (alreadyRegister == null || alreadyRegister.equals(this)) {
-//            registeredEnginesByName.put(getEngineName(), this);
-//        } else {
-//            throw new EngineAlreadyRegisteredException(
-//                    "Could not register engine.  There was already an engine registered under the name: " + getEngineName());
-//        }
+        // String url = getSyncUrl();
+        // ISymmetricEngine alreadyRegister = registeredEnginesByUrl.get(url);
+        // if (alreadyRegister == null || alreadyRegister.equals(this)) {
+        // if (url != null) {
+        // registeredEnginesByUrl.put(url, this);
+        // }
+        // } else {
+        // log.warn("Could not register engine. There was already an engine
+        // registered under the url: {}", getSyncUrl());
+        // }
+        //
+        // alreadyRegister = registeredEnginesByName.get(getEngineName());
+        // if (alreadyRegister == null || alreadyRegister.equals(this)) {
+        // registeredEnginesByName.put(getEngineName(), this);
+        // } else {
+        // throw new EngineAlreadyRegisteredException(
+        // "Could not register engine. There was already an engine registered
+        // under the name: " + getEngineName());
+        // }
 
     }
 

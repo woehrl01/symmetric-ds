@@ -15,13 +15,18 @@ import org.jumpmind.db.platform.IDatabasePlatform;
 import org.jumpmind.db.sql.ISqlTemplate;
 import org.jumpmind.db.sql.SqlPersistenceManager;
 import org.jumpmind.symmetric.common.TableConstants;
+import org.jumpmind.symmetric.service.impl.ExtensionService;
 import org.jumpmind.util.FormatUtils;
 import org.jumpmind.util.KeyedCache;
 import org.jumpmind.util.KeyedCache.ICacheRefresher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 @SuppressWarnings("unchecked")
 public abstract class AbstractService {
+    
+    protected final Logger log = LoggerFactory.getLogger(getClass());
 
     protected ISqlTemplate sqlTemplate;
 
@@ -42,6 +47,7 @@ public abstract class AbstractService {
         this.persistenceManager = new SqlPersistenceManager(platform);
         this.cache = new KeyedCache<Class<?>, TreeMap<String, Object>>(cacheTimeout, createCacheRefresher());
         initSqls();
+        this.cache.refreshCacheIfNeeded(false);
     }
     
     protected abstract Class<?>[] getCachedTypes();

@@ -63,7 +63,7 @@ public class KeyedCache<K, T> implements Serializable {
         lastRefreshTimeMs = 0;
     }
 
-    protected void refreshCacheIfNeeded(boolean refreshCache) {
+    public void refreshCacheIfNeeded(boolean refreshCache) {
         Map<K, T> copy = keyedCache;
         if (copy == null || refreshCache || (System.currentTimeMillis() - lastRefreshTimeMs) > timeoutTimeInMs) {
             synchronized (this) {
