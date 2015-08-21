@@ -13,14 +13,13 @@ import org.jumpmind.security.SecurityServiceFactory.SecurityServiceType;
 import org.jumpmind.symmetric.ITypedPropertiesFactory;
 import org.jumpmind.symmetric.common.ParameterConstants;
 import org.jumpmind.symmetric.db.ISymmetricDialect;
-import org.jumpmind.symmetric4.job.JobManager;
 import org.jumpmind.symmetric4.service.ConfigurationService;
 import org.jumpmind.symmetric4.service.ExtensionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-public abstract class AbstractSymmetricEngine implements ISymmetricEngine {
+public abstract class AbstractSymmetricEngine implements ISymmetricEngine, IApplicationContext {
 
     private static Map<String, ISymmetricEngine> registeredEnginesByUrl = new HashMap<String, ISymmetricEngine>();
     private static Map<String, ISymmetricEngine> registeredEnginesByName = new HashMap<String, ISymmetricEngine>();
@@ -49,7 +48,6 @@ public abstract class AbstractSymmetricEngine implements ISymmetricEngine {
 
     protected ExtensionService extensionService;
 
-    protected JobManager jobManager;
 
     protected AbstractSymmetricEngine(boolean registerEngine) {
         this.init(registerEngine);
@@ -77,11 +75,14 @@ public abstract class AbstractSymmetricEngine implements ISymmetricEngine {
 
         this.extensionService = new ExtensionService(tablePrefix, cacheTimeout, platform);
 
-        this.jobManager = new JobManager(configurationService);
-
         if (registerEngine) {
             registerEngine();
         }
+    }
+    
+    @Override
+    public <T> T getService(Class<T> clazz) {
+        return null;
     }
 
     public void start() {
@@ -101,8 +102,6 @@ public abstract class AbstractSymmetricEngine implements ISymmetricEngine {
     abstract protected ISymmetricDialect createSymmetricDialect();
 
     abstract protected ExtensionService createExtensionService();
-
-    abstract protected JobManager createJobManager();
 
     /**
      * Register this instance of the engine so it can be found by other

@@ -12,7 +12,7 @@ import org.jumpmind.symmetric.ext.ExtensionPointMetaData;
 import org.jumpmind.symmetric4.model.Extension;
 import org.jumpmind.util.KeyedCache.ICacheRefresher;
 
-public class ExtensionService extends AbstractService {
+public class ExtensionService extends AbstractCachedService {
     
     protected Map<Class, Map<String, IExtensionPoint>> staticExtensionsByClassByName = new HashMap<Class, Map<String, IExtensionPoint>>();
     

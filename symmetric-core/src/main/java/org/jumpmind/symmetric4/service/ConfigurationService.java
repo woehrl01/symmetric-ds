@@ -1,6 +1,5 @@
 package org.jumpmind.symmetric4.service;
 
-import java.nio.channels.Channel;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
@@ -10,7 +9,7 @@ import org.jumpmind.db.platform.IDatabasePlatform;
 import org.jumpmind.properties.TypedProperties;
 import org.jumpmind.symmetric.ITypedPropertiesFactory;
 import org.jumpmind.symmetric.common.ParameterConstants;
-import org.jumpmind.symmetric4.model.Extension;
+import org.jumpmind.symmetric4.model.Channel;
 import org.jumpmind.symmetric4.model.NodeGroup;
 import org.jumpmind.symmetric4.model.NodeGroupLink;
 import org.jumpmind.symmetric4.model.Parameter;
@@ -21,7 +20,7 @@ import org.jumpmind.util.AppUtils;
 import org.jumpmind.util.FormatUtils;
 import org.jumpmind.util.KeyedCache.ICacheRefresher;
 
-public class ConfigurationService extends AbstractService {
+public class ConfigurationService extends AbstractCachedService {
 
     protected ITypedPropertiesFactory propertiesFactory;
 
@@ -62,6 +61,7 @@ public class ConfigurationService extends AbstractService {
                 addParameters(parameters, newParameters, ParameterConstants.ALL, nodeGroupId, engineName);
                 addParameters(parameters, newParameters, externalId, ParameterConstants.ALL, engineName);
                 addParameters(parameters, newParameters, externalId, nodeGroupId, engineName);
+                ConfigurationService.this.parameters = newParameters;
                 return cache;
             }
 
