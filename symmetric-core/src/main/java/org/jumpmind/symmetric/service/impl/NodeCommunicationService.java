@@ -40,7 +40,7 @@ import org.jumpmind.db.sql.ISqlRowMapper;
 import org.jumpmind.db.sql.Row;
 import org.jumpmind.symmetric.common.ParameterConstants;
 import org.jumpmind.symmetric.db.ISymmetricDialect;
-import org.jumpmind.symmetric.model.DatabaseParameter;
+import org.jumpmind.symmetric.model.Parameter;
 import org.jumpmind.symmetric.model.Node;
 import org.jumpmind.symmetric.model.NodeCommunication;
 import org.jumpmind.symmetric.model.NodeCommunication.CommunicationType;
@@ -183,8 +183,8 @@ public class NodeCommunicationService extends AbstractService implements INodeCo
         if (parameterService.is(ParameterConstants.NODE_OFFLINE)) {
             nodes.clear();
         } else {
-            List<DatabaseParameter> parms = parameterService.getDatabaseParametersFor(ParameterConstants.NODE_OFFLINE);
-            for (DatabaseParameter parm : parms) {
+            List<Parameter> parms = parameterService.getDatabaseParametersFor(ParameterConstants.NODE_OFFLINE);
+            for (Parameter parm : parms) {
                 Iterator<Node> iter = nodes.iterator();
                 while (iter.hasNext()) {
                     Node node = iter.next();
@@ -210,7 +210,7 @@ public class NodeCommunicationService extends AbstractService implements INodeCo
                 nodesToCommunicateWith.addAll(nodeService.findNodesToPull());
             }
         } else {
-            List<DatabaseParameter> parms = parameterService.getDatabaseParametersFor(ParameterConstants.NODE_OFFLINE);
+            List<Parameter> parms = parameterService.getDatabaseParametersFor(ParameterConstants.NODE_OFFLINE);
             nodesToCommunicateWith = new ArrayList<Node>(parms.size());
             if (parms.size() > 0) {
                 List<Node> sourceNodes = null;
@@ -222,7 +222,7 @@ public class NodeCommunicationService extends AbstractService implements INodeCo
                     sourceNodes.addAll(nodeService.findNodesToPull());
                 }
                 if (sourceNodes != null && sourceNodes.size() > 0) {
-                    for (DatabaseParameter parm : parms) {
+                    for (Parameter parm : parms) {
                         for (Node node : sourceNodes) {
                             if ((parm.getNodeGroupId().equals(ParameterConstants.ALL) || parm.getNodeGroupId().equals(node.getNodeGroupId()) &&
                                     (parm.getExternalId().equals(ParameterConstants.ALL) || parm.getExternalId().equals(node.getExternalId())))) {
