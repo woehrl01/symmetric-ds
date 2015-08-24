@@ -7,12 +7,12 @@ import org.jumpmind.symmetric4.job.IScheduler;
 
 public class ReadDataForBatchingWorker extends AbstractScheduledWorker {
 
-    CreateBatchesWorker createBatchesJob;
+    CreateBatchesWorker createBatchesWorker;
 
     @Override
     public void init(IApplicationContext serviceContext, IScheduler scheduler) {
         super.init(serviceContext, scheduler);
-        this.createBatchesJob = serviceContext.getJob(CreateBatchesWorker.class);
+        this.createBatchesWorker = serviceContext.getWorker(CreateBatchesWorker.class);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class ReadDataForBatchingWorker extends AbstractScheduledWorker {
         {
             // foreach data
             {
-                createBatchesJob.queue(new Data());
+                createBatchesWorker.queue(new Data());
             }
         }
     }

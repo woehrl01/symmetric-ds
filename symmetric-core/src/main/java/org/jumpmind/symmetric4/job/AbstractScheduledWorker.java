@@ -13,6 +13,15 @@ abstract public class AbstractScheduledWorker extends AbstractWorker {
     @Override
     public void stop() {
     }
+    
+    public void scheduleNow() {
+        
+    }
+    
+    @Override
+    protected int getMaxNumberOfThreads() {
+        return 1;
+    }
 
     protected String getScheduleExpression() {
         return isNotBlank(getCronExpression()) ? getCronExpression() : getPeriodExpression();

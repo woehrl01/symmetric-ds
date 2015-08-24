@@ -4,6 +4,6 @@ public interface IApplicationContext {
 
     <T> T getService(Class<T> clazz);
     
-    <T> T getJob(Class<T> clazz);
+    <T> T getWorker(Class<T> clazz);
     
 }

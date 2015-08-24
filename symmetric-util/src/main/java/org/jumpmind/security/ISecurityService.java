@@ -20,11 +20,12 @@
  */
 package org.jumpmind.security;
 
+import org.jumpmind.util.IService;
 
 /**
  * Pluggable Service API that is responsible for encrypting and decrypting data.
  */
-public interface ISecurityService {
+public interface ISecurityService extends IService {
 
     public void init();
     

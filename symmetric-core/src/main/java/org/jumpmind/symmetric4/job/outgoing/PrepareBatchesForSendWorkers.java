@@ -45,7 +45,7 @@ public class PrepareBatchesForSendWorkers extends AbstractScheduledWorkers<NodeC
                 StagingService stagingService = appContext.getService(StagingService.class);
                 List<OutgoingBatch> batches = nodeChannelBatches.getBatches();
                 for (OutgoingBatch outgoingBatch : batches) {                    
-                    service.extract(outgoingBatch,stagingService.getWriterFor(outgoingBatch));
+                    service.extract(outgoingBatch,stagingService.getWriter(outgoingBatch));
                     sendBatchesJob.queue(nodeChannelBatches, outgoingBatch);
                 }
             }
