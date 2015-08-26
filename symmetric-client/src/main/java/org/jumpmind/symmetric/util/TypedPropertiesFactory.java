@@ -28,8 +28,8 @@ import java.util.Properties;
 
 import org.jumpmind.exception.IoException;
 import org.jumpmind.properties.TypedProperties;
-import org.jumpmind.symmetric.ITypedPropertiesFactory;
 import org.jumpmind.util.AppUtils;
+import org.jumpmind.util.ITypedPropertiesFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;

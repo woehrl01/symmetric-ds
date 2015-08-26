@@ -18,7 +18,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.jumpmind.symmetric;
+package org.jumpmind.util;
 
 import java.io.File;
 import java.util.Properties;

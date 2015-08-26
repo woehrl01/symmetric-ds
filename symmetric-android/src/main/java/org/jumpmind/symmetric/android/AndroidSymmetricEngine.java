@@ -31,7 +31,6 @@ import org.jumpmind.properties.TypedProperties;
 import org.jumpmind.security.SecurityServiceFactory.SecurityServiceType;
 import org.jumpmind.symmetric.AbstractSymmetricEngine;
 import org.jumpmind.symmetric.ISymmetricEngine;
-import org.jumpmind.symmetric.ITypedPropertiesFactory;
 import org.jumpmind.symmetric.db.ISymmetricDialect;
 import org.jumpmind.symmetric.db.sqlite.SqliteSymmetricDialect;
 import org.jumpmind.symmetric.io.stage.IStagedResource;
@@ -53,6 +52,7 @@ import org.jumpmind.symmetric.service.IRouterService;
 import org.jumpmind.symmetric.service.impl.ExtensionService;
 import org.jumpmind.symmetric.service.impl.NodeCommunicationService;
 import org.jumpmind.symmetric.service.impl.RouterService;
+import org.jumpmind.util.ITypedPropertiesFactory;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;

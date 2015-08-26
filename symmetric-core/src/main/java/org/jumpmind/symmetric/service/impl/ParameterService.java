@@ -31,12 +31,12 @@ import org.jumpmind.db.sql.ISqlRowMapper;
 import org.jumpmind.db.sql.ISqlTemplate;
 import org.jumpmind.db.sql.Row;
 import org.jumpmind.properties.TypedProperties;
-import org.jumpmind.symmetric.ITypedPropertiesFactory;
 import org.jumpmind.symmetric.common.ParameterConstants;
 import org.jumpmind.symmetric.config.IParameterFilter;
 import org.jumpmind.symmetric.config.IParameterSaveFilter;
 import org.jumpmind.symmetric.model.Parameter;
 import org.jumpmind.symmetric.service.IParameterService;
+import org.jumpmind.util.ITypedPropertiesFactory;
 
 /**
  * @see IParameterService

@@ -112,6 +112,54 @@ project(':symmetric-io') {
     }
 }
 
+project(':symmetric-4') {
+    description = 'Working area for SymmetricDS 4 development'
+
+    dependencies {
+        compile project(":symmetric-io")
+        compile project(":symmetric-util")
+        compile 'org.yaml:snakeyaml:1.15'
+        compile "commons-fileupload:commons-fileupload:$commonsFileuploadVersion"
+        compile project(":symmetric-jdbc")
+        compile "org.springframework:spring-context:$springVersion"
+        compile "commons-cli:commons-cli:$commonsCliVersion"
+        compile "commons-vfs:commons-vfs:1.0"
+        compile "com.jcraft:jsch:0.1.48"
+        compile "javax.mail:mail:1.4.5"
+        compile "org.springframework:spring-jms:$springVersion"
+        compile "org.springframework:spring-web:$springVersion"
+        compile "javax.xml.bind:jaxb-api:2.2.7"
+        compile "org.codehaus.jackson:jackson-mapper-asl:1.9.9"
+        compile "org.jdom:jdom:1.1"
+        compile ("com.mangofactory:swagger-springmvc:0.6.5") {
+            exclude group: 'asm'
+        }
+        compile "javax.servlet:javax.servlet-api:$servletVersion"
+
+        provided "javax.jms:jms-api:1.1-rev-1"
+        provided "org.mongodb:mongo-java-driver:2.12.3"
+        provided "org.codehaus.mojo:animal-sniffer-annotations:$animalSnifferVersion"
+        provided ("com.amazonaws:aws-java-sdk:1.8.9.1") {
+            exclude group: 'commons-logging'
+            exclude group: 'com.fasterxml.jackson.core'
+            exclude group: 'commons-codec'
+        }
+        provided "org.eclipse.jetty:jetty-annotations:$jettyVersion"
+        provided "org.eclipse.jetty:jetty-servlets:$jettyVersion"
+        provided "org.eclipse.jetty:jetty-webapp:$jettyVersion"
+        provided "org.eclipse.jetty:jetty-jmx:$jettyVersion"
+        provided "mx4j:mx4j-tools:3.0.1"
+        
+
+        provided "org.mongodb:mongo-java-driver:2.12.3"
+        provided "org.codehaus.mojo:animal-sniffer-annotations:$animalSnifferVersion"
+        provided "com.amazonaws:aws-java-sdk:1.9.17"
+        
+        testCompile project(path: ':symmetric-util', configuration: 'testArtifacts')
+        testCompile project(path: ':symmetric-jdbc', configuration: 'testArtifacts')
+    }
+}
+
 project(':symmetric-core') {
     description = 'Central SymmetricDS library.  Excludes direct dependencies on JDBC.'
 

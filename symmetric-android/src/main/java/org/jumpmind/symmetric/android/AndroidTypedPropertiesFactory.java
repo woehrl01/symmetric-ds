@@ -26,8 +26,8 @@ import java.util.Properties;
 
 import org.jumpmind.exception.IoException;
 import org.jumpmind.properties.TypedProperties;
-import org.jumpmind.symmetric.ITypedPropertiesFactory;
 import org.jumpmind.symmetric.common.ParameterConstants;
+import org.jumpmind.util.ITypedPropertiesFactory;
 
 public class AndroidTypedPropertiesFactory implements ITypedPropertiesFactory {
 
