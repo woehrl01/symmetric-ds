@@ -40,7 +40,7 @@ These are goals for the 4.0 release.
  * Simplify registration and distribution of configuration 
  * Make sending data loads cleaner
    * Remove the concept of initial load and reverse initial load from sym_node_security in favor of some type of 
- * *Clean up DDL Utils*
+ * Clean up DDL Utils
    * Faster
    * More accurate
    * Support reading metadata about triggers
@@ -48,7 +48,7 @@ These are goals for the 4.0 release.
 * Architect to support new features
   * Separate the configuration datasource from the runtime datasource
     * Do not require SymmetricDS tables to be installed on a target database
-    * Allow the architecture to better support *NOSQL* data source and targets
+    * Allow the architecture to better support NOSQL data source and targets
 load request structure
 
 ### Longer Term Goals
