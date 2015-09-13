@@ -26,7 +26,19 @@ public class SqlPersistenceManager extends AbstractPersistenceManager {
     
     @Override
     public <T> T map(Map<String, Object> row, Class<T> clazz, String catalogName, String schemaName, String tableName) {
-        return null;
+        try {
+            T object = clazz.newInstance();
+            Table table = findTable(catalogName, schemaName, tableName);
+            LinkedHashMap<String, Column> objectToTableMapping = mapObjectToTable(object, table);
+            Set<String> propertyNames = objectToTableMapping.keySet();
+            for (String propertyName : propertyNames) {
+                Object value = row.get(objectToTableMapping.get(propertyName).getName());
+                BeanUtils.copyProperty(object, propertyName, value);
+            }
+            return object;
+        } catch (Exception e) {
+            throw toRuntimeException(e);
+        }
     }
 
     /**
