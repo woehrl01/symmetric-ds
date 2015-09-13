@@ -23,6 +23,11 @@ public class SqlPersistenceManager extends AbstractPersistenceManager {
     public SqlPersistenceManager(IDatabasePlatform databasePlatform) {
         this.databasePlatform = databasePlatform;
     }
+    
+    @Override
+    public <T> T map(Map<String, Object> row, Class<T> clazz, String catalogName, String schemaName, String tableName) {
+        return null;
+    }
 
     /**
      * @return true if the object was created, false if the object was updated
