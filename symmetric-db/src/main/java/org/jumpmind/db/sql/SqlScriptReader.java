@@ -42,12 +42,22 @@ public class SqlScriptReader extends LineNumberReader implements ISqlStatementSo
 
     private boolean usePrefixSuffixForReplacementTokens = false;
 
+    private boolean stripOutBlockComments = false;
+
     public SqlScriptReader(Reader in) {
         super(in);
     }
 
     public void setUsePrefixSuffixForReplacementTokens(boolean usePrefixSuffixForReplacementTokens) {
         this.usePrefixSuffixForReplacementTokens = usePrefixSuffixForReplacementTokens;
+    }
+
+    public void setStripOutBlockComments(boolean stripOutBlockComments) {
+        this.stripOutBlockComments = stripOutBlockComments;
+    }
+
+    public boolean isStripOutBlockComments() {
+        return stripOutBlockComments;
     }
 
     public boolean isUsePrefixSuffixForReplacementTokens() {
@@ -121,18 +131,19 @@ public class SqlScriptReader extends LineNumberReader implements ISqlStatementSo
 
     private final String removeComments(String s) {
         char[] characters = s.toCharArray();
-        boolean inLiteral = false;
+        LiteralInfo literalInfo = null;
         boolean inLineComment = false;
         boolean inBlockComment = false;
+        int skipNextCount = 0;
 
         StringBuilder commentsRemoved = new StringBuilder();
         char prev = '\0';
+        int index = 0;
         for (char cur : characters) {
-            if (switchLiteral(prev, cur, inLiteral)) {
-                inLiteral = !inLiteral;
-            }
+            
+            literalInfo = switchLiteral(literalInfo, index, characters);
 
-            if (!inLiteral && !inLineComment && !inBlockComment) {
+            if (literalInfo == null && !inLineComment && !inBlockComment) {
                 inBlockComment = isBlockCommentStart(prev, cur);
                 inLineComment = isLineCommentStart(prev, cur);
             }
@@ -143,16 +154,20 @@ public class SqlScriptReader extends LineNumberReader implements ISqlStatementSo
 
             if (inBlockComment && isBlockCommentEnd(prev, cur)) {
                 inBlockComment = false;
+                skipNextCount = 2;
             }
 
-            if (!inBlockComment && !inLineComment) {
+            if (!inBlockComment && !inLineComment && skipNextCount == 0) {
                 commentsRemoved.append(prev);
+            } else if (skipNextCount > 0) {
+                skipNextCount--;
             }
 
             prev = cur;
+            index++;
         }
-        
-        if (!inBlockComment && !inLineComment) {
+
+        if (!inBlockComment && !inLineComment && skipNextCount == 0) {
             commentsRemoved.append(prev);
         }
 
@@ -168,33 +183,53 @@ public class SqlScriptReader extends LineNumberReader implements ISqlStatementSo
     }
 
     private final boolean isBlockCommentStart(char prev, char cur) {
-        return (prev == '/' && cur == '*');
+        return stripOutBlockComments && (prev == '/' && cur == '*');
     }
 
     private final boolean isBlockCommentEnd(char prev, char cur) {
         return (prev == '*' && cur == '/');
     }
-    
-    private final boolean switchLiteral(char prev, char cur, boolean inLiteral) {
-        return (prev =='\'' && !inLiteral || (inLiteral && cur != '\'' && prev == '\'')) ||
-                (prev =='"') ||
-                (prev =='`');
+
+    private final LiteralInfo switchLiteral(LiteralInfo literalInfo, int currentIndex, char[] statement) {
+        if (literalInfo == null && currentIndex > 0) {
+            char prev = statement[currentIndex - 1];
+            if (prev == '\'' || prev == '"' || prev == '`') {
+                literalInfo = new LiteralInfo(prev, currentIndex);
+            }
+        } else if (literalInfo != null) {
+            char cur = statement[currentIndex];
+            char prev = statement[currentIndex - 1];
+            if (prev == literalInfo.type && cur != literalInfo.type) {
+                int count = 0;
+                for (int i = currentIndex - 2; i >= literalInfo.startIndex; i--) {
+                    char check = statement[i];
+                    if (check == literalInfo.type) {
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+                if (count%2==0) {
+                    literalInfo = null;
+                }
+            }
+        }
+
+        return literalInfo;
     }
 
     private final boolean checkStatementEnds(String s) {
         char[] characters = s.toCharArray();
-        boolean inLiteral = false;
+        LiteralInfo literalInfo = null;
         boolean inLineComment = false;
         boolean inBlockComment = false;
 
         char prev = '\0';
-        int index = 0;
+        int index = 0;        
         for (char cur : characters) {
-            if (switchLiteral(prev, cur, inLiteral)) {
-                inLiteral = !inLiteral;
-            }
+            literalInfo = switchLiteral(literalInfo, index, characters);
 
-            if (!inLiteral && !inLineComment && !inBlockComment) {
+            if (literalInfo == null && !inLineComment && !inBlockComment) {
                 inBlockComment = isBlockCommentStart(prev, cur);
                 inLineComment = isLineCommentStart(prev, cur);
             }
@@ -207,7 +242,7 @@ public class SqlScriptReader extends LineNumberReader implements ISqlStatementSo
                 inBlockComment = false;
             }
 
-            if (!inLiteral && !inBlockComment && !inLineComment && s.substring(index).startsWith(delimiter)) {
+            if (literalInfo == null && !inBlockComment && !inLineComment && s.substring(index).startsWith(delimiter)) {
                 return true;
             }
 
@@ -215,6 +250,17 @@ public class SqlScriptReader extends LineNumberReader implements ISqlStatementSo
             index++;
         }
         return false;
+    }
+
+    class LiteralInfo {
+
+        public LiteralInfo(char type, int startIndex) {
+            this.type = type;
+            this.startIndex = startIndex;
+        }
+
+        char type;
+        int startIndex;
     }
 
 }
