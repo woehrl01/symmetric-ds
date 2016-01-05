@@ -141,10 +141,16 @@ abstract public class AbstractDatabaseWriter implements IDataWriter {
                 start(context.getLastParsedTable());
             }
             if (targetTable != null || !data.requiresTable()
-                    || (targetTable == null && data.getDataEventType() == DataEventType.SQL)) {
+                    || (targetTable == null && data.getDataEventType() == DataEventType.SQL)
+                    && !isIgnored()) {
                 try {
-                    statistics.get(batch).increment(DataWriterStatisticConstants.STATEMENTCOUNT);
+                	statistics.get(batch).increment(DataWriterStatisticConstants.STATEMENTCOUNT);
                     statistics.get(batch).increment(DataWriterStatisticConstants.LINENUMBER);
+                    
+                	ResolvedData resolvedData = getResolvedData();
+                	if (resolvedData != null && resolvedData.getResolvedData() != null) {
+                		data.putCsvData(CsvData.ROW_DATA, resolvedData.getResolvedData());
+                	}
                     if (filterBefore(data)) {
                         LoadStatus loadStatus = LoadStatus.SUCCESS;
                         switch (data.getDataEventType()) {
@@ -169,7 +175,7 @@ abstract public class AbstractDatabaseWriter implements IDataWriter {
                             default:
                                 break;
                         }
-
+                        
                         if (loadStatus == LoadStatus.CONFLICT) {
                             if (conflictResolver != null) {
                                 conflictResolver.needsResolved(this, data, loadStatus);
@@ -194,7 +200,7 @@ abstract public class AbstractDatabaseWriter implements IDataWriter {
                     rollback();
                     throw ex;
                 } catch (RuntimeException ex) {
-                    if (filterError(data, ex)) {
+                	if (filterError(data, ex)) {
                         if (!(ex instanceof SqlException)) {
                             /*
                              * SQL exceptions should have already been logged
@@ -221,6 +227,16 @@ abstract public class AbstractDatabaseWriter implements IDataWriter {
         }
     }
 
+    protected boolean isIgnored() {
+    	ResolvedData resolvedData = getResolvedData();
+        return resolvedData == null ? false : resolvedData.isIgnoreRow();
+    }
+    
+    protected ResolvedData getResolvedData() {
+    	Statistics stats = statistics.get(context.getBatch());
+        return writerSettings.getResolvedData(stats.get(DataWriterStatisticConstants.LINENUMBER));
+    }
+    
     protected void checkForEarlyCommit() {
         if (uncommittedCount >= writerSettings.getMaxRowsBeforeCommit()) {
             commit(true);
