@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
@@ -166,17 +168,34 @@ public class SqliteDdlReader implements IDdlReader {
     static class ColumnMapper extends AbstractSqlRowMapper<Column> {
         public Column mapRow(Row row) {
             Column col = new Column((String) row.get("name"), booleanValue(row.get("pk")));
-            col.setMappedType(toJdbcType((String) row.get("type")));
+            String columnType = (String) row.get("type");
+            col.setMappedType(toJdbcType(columnType));
+            col.setSize(toSize(columnType));
             col.setRequired(booleanValue(row.get("notnull")));
             col.setDefaultValue(scrubDefaultValue((String) row.get("dflt_value")));
             return col;
         }
+        
+        private Pattern numberPattern = Pattern.compile("(\\d+)");
 
         protected String scrubDefaultValue(String defaultValue) {
             if (defaultValue != null && defaultValue.startsWith("'") && defaultValue.endsWith("'")) {
                 defaultValue = defaultValue.substring(1, defaultValue.length() - 1);
             }
             return defaultValue;
+        }
+        
+        public String toSize(String colType){
+        	colType = colType == null ? "TEXT" : colType.toUpperCase();
+        	if(colType.contains("CHAR")){
+        		
+                Matcher matcher = numberPattern.matcher(colType);
+                if(matcher.find()){
+                	return matcher.group(1);
+                }
+        	}
+        	
+        	return null;
         }
 
         public String toJdbcType(String colType) {
